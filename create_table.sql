@@ -1,4 +1,3 @@
-BEGIN;
 
 CREATE DATABASE moviedb;
 USE moviedb;
@@ -91,4 +90,4 @@ CREATE TABLE `ratings` (
   CONSTRAINT `ratings_ibfk_1` FOREIGN KEY (`movieId`) REFERENCES `movies` (`id`)
 );
 
-COMMIT;
+
