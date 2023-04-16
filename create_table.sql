@@ -1,5 +1,5 @@
-CREATE DATABASE moviedb20;
-USE moviedb20;
+CREATE DATABASE moviedb;
+USE moviedb;
 
 CREATE TABLE `movies` (
   `id` varchar(10) NOT NULL,
