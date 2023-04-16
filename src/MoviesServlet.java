@@ -97,15 +97,18 @@ public class MoviesServlet extends HttpServlet {
                 //Stars NOW
                 JsonArray starList = new JsonArray();
 
-                String starsQuery = "SELECT s.name FROM stars_in_movies as sim, stars as s, movies as m WHERE sim.movieId=m.id AND sim.starId=s.id AND m.id=? LIMIT 3 ";
+                String starsQuery = "SELECT s.name, s.id FROM stars_in_movies as sim, stars as s, movies as m WHERE sim.movieId=m.id AND sim.starId=s.id AND m.id=? LIMIT 3";
                 PreparedStatement statement3 = conn.prepareStatement(starsQuery);
                 statement3.setString(1, id);
 
                 ResultSet rs3 = statement3.executeQuery();
                 while(rs3.next()) {
                     String name = rs3.getString("name");
+                    String starId = rs3.getString("id");
+
                     JsonObject starName = new JsonObject();
                     starName.addProperty("name", name);
+                    starName.addProperty("id", starId);
                     starList.add(starName);
 
 

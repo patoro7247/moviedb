@@ -22,6 +22,7 @@ function handleStarResult(resultData) {
 
     console.log(resultData[0]["genres"]);
 
+    let rank = 1;
     // Iterate through resultData, no more than 10 entries
     for (let i = 0; i < Math.min(20, resultData.length); i++) {
 
@@ -45,7 +46,9 @@ function handleStarResult(resultData) {
 
         for(let i = 0; i < starArray.length; i++){
 
-            let starItem = starArray[i]['name'];
+            let starItem ='<a href="single-star.html?id=' + starArray[i]['id'] + '">'
+                + starArray[i]["name"] +     // display star_name for the link text
+                '</a>';
             starString = starString + starItem + ", ";
         }
         //get rid of comma
@@ -57,6 +60,7 @@ function handleStarResult(resultData) {
         // Concatenate the html tags with resultData jsonObject
         let rowHTML = "";
         rowHTML += "<tr>";
+        rowHTML += "<th>"+rank+"</th>";
         rowHTML +=
             "<th>" +
             // Add a link to single-star.html with id passed with GET url parameter
@@ -74,6 +78,7 @@ function handleStarResult(resultData) {
 
         // Append the row created to the table body, which will refresh the page
         starTableBodyElement.append(rowHTML);
+        rank++;
     }
 }
 
