@@ -93,7 +93,7 @@ public class SingleMovieServlet extends HttpServlet {
 
 
             //Write first query JSON string to output
-            String query2 = "SELECT g.name FROM genres_in_movies as gim, genres as g WHERE gim.movieId=? AND gim.genreId=g.id";
+            String query2 = "SELECT g.name FROM genres_in_movies as gim, genres as g WHERE gim.movieId=? AND gim.genreId=g.id ORDER BY g.name ASC";
             PreparedStatement statement2 = conn.prepareStatement(query2);
             statement2.setString(1, id);
 
@@ -116,7 +116,7 @@ public class SingleMovieServlet extends HttpServlet {
 
 
             //STARS NOW
-            String query3 = "SELECT s.id, s.name FROM stars as s, stars_in_movies as sim WHERE sim.movieId=? AND s.id=sim.starId";
+            String query3 = "SELECT s.id, s.name FROM stars as s, stars_in_movies as sim WHERE sim.movieId=? AND s.id=sim.starId ORDER BY s.name ASC";
             PreparedStatement statement3 = conn.prepareStatement(query3);
             statement3.setString(1, id);
 

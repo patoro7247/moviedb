@@ -86,7 +86,7 @@ public class SingleStarServlet extends HttpServlet {
             rs.close();
             statement.close();
 
-            String query2 = "SELECT m.title, sim.movieId FROM stars_in_movies as sim, movies as m WHERE sim.starId=? AND sim.movieId = m.id";
+            String query2 = "SELECT m.title, sim.movieId FROM stars_in_movies as sim, movies as m WHERE sim.starId=? AND sim.movieId = m.id ORDER BY m.title ASC";
             PreparedStatement statement2 = conn.prepareStatement(query2);
             statement2.setString(1, id);
             ResultSet rs2 = statement2.executeQuery();

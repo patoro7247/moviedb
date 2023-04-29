@@ -75,7 +75,7 @@ public class MoviesServlet extends HttpServlet {
                 JsonArray genreList = new JsonArray();
 
                 //Statement statement2 = conn.createStatement();
-                String genreQuery = "SELECT g.name FROM genres as g, genres_in_movies as gim, movies as m WHERE g.id=gim.genreId AND m.id=? AND m.id=gim.movieId LIMIT 3";
+                String genreQuery = "SELECT g.name FROM genres as g, genres_in_movies as gim, movies as m WHERE g.id=gim.genreId AND m.id=? AND m.id=gim.movieId ORDER BY g.name ASC LIMIT 3";
                 PreparedStatement statement2 = conn.prepareStatement(genreQuery);
                 statement2.setString(1, id);
 
@@ -97,7 +97,7 @@ public class MoviesServlet extends HttpServlet {
                 //Stars NOW
                 JsonArray starList = new JsonArray();
 
-                String starsQuery = "SELECT s.name, s.id FROM stars_in_movies as sim, stars as s, movies as m WHERE sim.movieId=m.id AND sim.starId=s.id AND m.id=? LIMIT 3";
+                String starsQuery = "SELECT s.name, s.id FROM stars_in_movies as sim, stars as s, movies as m WHERE sim.movieId=m.id AND sim.starId=s.id AND m.id=? ORDER BY s.name ASC LIMIT 3";
                 PreparedStatement statement3 = conn.prepareStatement(starsQuery);
                 statement3.setString(1, id);
 

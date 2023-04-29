@@ -1,0 +1,21 @@
+.browse-container{
+    display: flex;
+    flex-direction: column;
+
+}
+
+.browse-title-container{
+    text-align: center;
+}
+
+.browse-genre-container{
+    text-align: center;
+}
+
+#div-limit-results {
+    display: inline
+}
+
+#ul-limit-results li {
+    display: inline;
+}
