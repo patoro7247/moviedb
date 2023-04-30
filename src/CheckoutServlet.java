@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 
 @WebServlet(name = "CheckoutServlet", urlPatterns = "/api/checkout")
 public class CheckoutServlet extends HttpServlet {
@@ -102,12 +103,15 @@ public class CheckoutServlet extends HttpServlet {
 
                         while(movieRs.next()){
                             String movieId = movieRs.getString("id");
+                            String date = java.time.LocalDate.now().toString();
 
-                            String insertSalesQuery = "INSERT INTO sales VALUES (NULL, ?, ?, DATE '2023-04-30')";
+                            String insertSalesQuery = "INSERT INTO sales VALUES (NULL, ?, ?, DATE ?)";
                             PreparedStatement salesInsertStatement = conn.prepareStatement(insertSalesQuery);
 
                             salesInsertStatement.setInt(1, user_id);
                             salesInsertStatement.setString(2, movieId);
+                            salesInsertStatement.setString(3, date);
+
                             int row = salesInsertStatement.executeUpdate();
                             responseJsonObject.addProperty("rowsUpdated", row);
                         }
