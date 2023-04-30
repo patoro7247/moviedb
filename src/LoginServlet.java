@@ -46,7 +46,7 @@ public class LoginServlet extends HttpServlet {
             // Get a connection from dataSource
 
             // Construct a query with parameter represented by "?"
-            String query = "SELECT password from customers where email=?";
+            String query = "SELECT password, id from customers where email=?";
 
             // Declare our statement
             PreparedStatement statement = conn.prepareStatement(query);
@@ -62,11 +62,12 @@ public class LoginServlet extends HttpServlet {
             while (rs.next()) {
 
                 String realPassword = rs.getString("password");
+                int id = Integer.parseInt(rs.getString("id"));
                 // Create a JsonObject based on the data we retrieve from rs
 
                 if( password.equals(realPassword)){
                     //credentials match, log user in
-                    request.getSession().setAttribute("user", new User(username));
+                    request.getSession().setAttribute("user", new User(username, id));
 
                     responseJsonObject.addProperty("status", "success");
                     responseJsonObject.addProperty("message", "success");

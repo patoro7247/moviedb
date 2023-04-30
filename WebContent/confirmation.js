@@ -20,14 +20,35 @@ function addToCart(title){
         success: (resultData) => handleAddToCartSuccess(resultData) // Setting callback function to handle data returned successfully by the SingleStarServlet
     });
 
-    //alert("Movie added!");
+}
+
+function checkout(){
+    //clicking button routes user to checkout.html/347
+    //347 can be any number, that's the only number we're concerned about passing
+    window.location.replace("checkout.html?total=" + netTotal);
+}
+
+function increment(){
 
 }
+
+function decrement(){
+
+}
+
+function handleAddToCartSuccess(resultData) {
+    console.log("movie added!");
+}
+
+
+
+
 /**
  * Retrieve parameter from request URL, matching by parameter name
  * @param target String
  * @returns {*}
  */
+
 function getParameterByName(target) {
     // Get request URL
     let url = window.location.href;
@@ -48,56 +69,54 @@ function getParameterByName(target) {
  * Handles the data returned by the API, read the jsonObject and populate data into html elements
  * @param resultData jsonObject
  */
-
+let netTotal = 0;
 function handleResult(resultData) {
-
-
-    // populate the star info h3
-    // find the empty h3 body by id "star_info"
-    let starInfoElement = jQuery("#movie_info");
-
-    // append two html <p> created to the h3 body, which will refresh the page
-    starInfoElement.append("<h3>" + resultData[0]["title"] + "</h3>");
-
-    console.log("handleResult: populating movie table from resultData");
-    console.log(resultData[1]);
-    let genreString = resultData[1]["genres"];
-    /*
-    let genreString = "";
-    for(let i = 0; i < genreArray.length; i++){
-        genreString += genreArray[i] + ", ";
-    }
-    if(genreString.length > 1) genreString = genreString.substring(0, genreString.length-2);
-    */
-
-    console.log(genreString);
-    let starArray = resultData[2];
-    console.log(starArray);
+    console.log("handleResults: populating movie table from resultData");
 
     // Populate the star table
-    // Find the empty table body by id "movie_table_body"
-    let movieTableBodyElement = jQuery("#movie_table_body");
-    let rowHTML = "";
-    rowHTML += "<tr>";
-    rowHTML += "<th>" + resultData[0]["title"] + "</th>";
-    rowHTML += "<th>" + resultData[0]["year"] + "</th>";
-    rowHTML += "<th>" + resultData[0]["director"] + "</th>";
-    rowHTML += "<th>" + resultData[0]["rating"] + "</th>";
-    rowHTML += "<th>" + genreString + "</th>";
-    rowHTML += "<th>";
-    for(let i =0; i < starArray.length; i++){
-        rowHTML += '<a href="single-star.html?id=' + starArray[i]['id'] + '">'
-            + starArray[i]["name"] +     // display star_name for the link text
-            '</a>';
-        rowHTML += ", ";
+    // Find the empty table body by id "star_table_body"
+    let starTableBodyElement = jQuery("#movie_table_body");
+
+    console.log(resultData[0]["title"]);
+    console.log(resultData[0]["quantity"]);
+
+
+
+    // Iterate through resultData, no more than 10 entries
+    //old middle conditional: i < Math.min(20, resultData.length)
+    for (let i = 0; i < resultData.length; i++) {
+        let total = 5*parseInt(resultData[i]["quantity"]);
+        netTotal += total;
+
+        // Concatenate the html tags with resultData jsonObject
+        let rowHTML = "";
+        rowHTML += "<tr>";
+        //rowHTML += "<th>"+rank+"</th>";
+
+        rowHTML += "<th>" + resultData[i]["title"] + "</th>";
+        rowHTML += "<th>$" + 5.00 + "</th>";
+        rowHTML += "<th>" + resultData[i]["quantity"] + "</th>";
+
+
+        rowHTML += "<th>$" + total + "</th>";
+
+        rowHTML += "</tr>";
+        //<button type="button" data-target="#navbarNav" onClick="prev()" >Prev</button>
+        // Append the row created to the table body, which will refresh the page
+        starTableBodyElement.append(rowHTML);
+
     }
-    rowHTML += "<th>";
 
-    rowHTML += "<th>" + '<button type="button" onclick="addToCart(\'' +resultData[0]['title'] + '\')">'+"Add"+'</button>' +"</th>";
+    let totalElement = jQuery("#total_amount");
+    let totalHTML = "<h3>$"+netTotal+" </h3>";
 
-    rowHTML += "</tr>";
-    movieTableBodyElement.append(rowHTML);
-    // Concatenate the html tags with resultData jsonObject to create table rows
+    totalElement.append(totalHTML);
+
+    let transactionElement = jQuery("#transaction_id");
+    let randomId = parseInt(Math.random() * 14000);
+    let transactionHTML = "<h3>"+randomId+"</h3>";
+
+    transactionElement.append(transactionHTML);
 
 }
 
@@ -105,13 +124,9 @@ function handleResult(resultData) {
  * Once this .js is loaded, following scripts will be executed by the browser\
  */
 
-// Get id from URL
-let starId = getParameterByName('id');
-
-// Makes the HTTP GET request and registers on success callback function handleResult
 jQuery.ajax({
     dataType: "json",  // Setting return data type
     method: "GET",// Setting request method
-    url: "api/single-movie?id=" + starId, // Setting request url, which is mapped by StarsServlet in Stars.java
+    url: "api/transaction", // Setting request url, which is mapped by StarsServlet in Stars.java
     success: (resultData) => handleResult(resultData) // Setting callback function to handle data returned successfully by the SingleStarServlet
 });

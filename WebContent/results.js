@@ -9,6 +9,24 @@
  *      3. Populate the data to correct html elements.
  */
 
+function addToCart(title){
+    console.log(title);
+    //somehow add this movieId to the user's session
+    // send request to server with
+    jQuery.ajax({
+        dataType: "json",  // Setting return data type
+        method: "GET",// Setting request method
+        url: "api/shoppingcart?title=" + title, // Setting request url, which is mapped by StarsServlet in Stars.java
+        success: (resultData) => handleAddToCartSuccess(resultData) // Setting callback function to handle data returned successfully by the SingleStarServlet
+    });
+
+    //alert("Movie added!");
+
+}
+
+function handleAddToCartSuccess(resultData) {
+    console.log("movie added!");
+}
 
 function next(){
     let url = window.location.href;
@@ -20,7 +38,15 @@ function next(){
     let newOffset = parseInt(offset) + parseInt(max);
 
     //window.location.search = jQuery.query.set("offset", newOffset);
-    window.location.replace("results.html?title=" + title+"&year="+year+"&director="+director+"&star="+star+"&offset="+newOffset+"&max="+max)
+    if(getParameterByName('prefix') != null){
+        let pref = getParameterByName('prefix');
+        window.location.replace("results.html?prefix=" + pref+"&offset="+newOffset+"&max="+max);
+    }else if(getParameterByName('title') != null){
+        window.location.replace("results.html?title=" + title+"&year="+year+"&director="+director+"&star="+star+"&offset="+newOffset+"&max="+max);
+    }else{
+        window.location.replace("results.html?genre=" + genre+"&offset="+newOffset+"&max="+max);
+    }
+
 
 }
 
@@ -38,7 +64,20 @@ function prev(){
     if( newOffset < -1){
         return;
     }else{
-        window.location.replace("results.html?title=" + title+"&year="+year+"&director="+director+"&star="+star+"&offset="+newOffset+"&max="+max)
+        if(getParameterByName('prefix') != null){
+            let pref = getParameterByName('prefix');
+            window.location.replace("results.html?prefix=" + pref+"&offset="+newOffset+"&max="+max);
+        }else if(getParameterByName('title') != null ){
+            let title = getParameteryByName('title');
+
+            window.location.replace("results.html?title=" + title+"&year="+year+"&director="+director+"&star="+star+"&offset="+newOffset+"&max="+max);
+        }else{
+            //let genre = getParameteryByName('genre');
+            window.location.replace("results.html?genre=" + genre+"&offset="+newOffset+"&max="+max);
+        }
+
+
+        //window.location.replace("results.html?title=" + title+"&year="+year+"&director="+director+"&star="+star+"&offset="+newOffset+"&max="+max)
 
     }
 
@@ -47,7 +86,15 @@ function prev(){
 function limit(lim){
     console.log(lim);
     //change max query to lim
-    window.location.replace("results.html?title=" + title+"&year="+year+"&director="+director+"&star="+star+"&offset=0"+"&max="+lim);
+    if(getParameterByName('prefix') != null){
+        let pref = getParameterByName('prefix');
+        window.location.replace("results.html?prefix=" + pref+"&offset=0"+"&max="+lim);
+    }else if(getParameterByName('title') != null){
+        window.location.replace("results.html?title=" + title+"&year="+year+"&director="+director+"&star="+star+"&offset=0"+"&max="+lim);
+    }else{
+        window.location.replace("results.html?genre=" + genre+"&offset=0"+"&max="+lim);
+    }
+
 
 }
 
@@ -100,8 +147,14 @@ function handleResult(resultData) {
 
         for(let i = 0; i < genreArray.length; i++){
 
-            let genreItem = genreArray[i]['genreName'];
+            let oldGenreItem = genreArray[i]['genreName'];
+
+            let genreItem = '<a href="results.html?genre=' + genreArray[i]['genreName'] + '&offset=0&max=25">'
+                + genreArray[i]["genreName"] +     // display star_name for the link text
+                '</a>';
             genreString = genreString + genreItem + ", ";
+
+
         }
         if(genreString.length > 1) genreString = genreString.substring(0, genreString.length-2);
 
@@ -114,7 +167,7 @@ function handleResult(resultData) {
 
         for(let i = 0; i < starArray.length; i++){
 
-            let starItem ='<a href="single-star.html?id=' + starArray[i]['id'] + '">'
+            let starItem = '<a href="single-star.html?id=' + starArray[i]['id'] + '">'
                 + starArray[i]["name"] +     // display star_name for the link text
                 '</a>';
             starString = starString + starItem + ", ";
@@ -141,9 +194,10 @@ function handleResult(resultData) {
         rowHTML += "<th>" + resultData[i]["rating"] + "</th>";
         rowHTML += "<th>" + genreString + "</th>";
         rowHTML += "<th>" + starString + "</th>";
+        rowHTML += "<th>" + '<button type="button" onclick="addToCart(\'' +resultData[i]['title'] + '\')">'+"Add"+'</button>' +"</th>";
 
         rowHTML += "</tr>";
-
+        //<button type="button" data-target="#navbarNav" onClick="prev()" >Prev</button>
         // Append the row created to the table body, which will refresh the page
         starTableBodyElement.append(rowHTML);
         rank++;
@@ -177,7 +231,7 @@ if(prefix != null) {
     jQuery.ajax({
         dataType: "json",  // Setting return data type
         method: "GET",// Setting request method
-        url: "api/results?prefix=" + prefix, // Setting request url, which is mapped by StarsServlet in Stars.java
+        url: "api/results?prefix=" + prefix+"&offset="+offset+"&max="+max, // Setting request url, which is mapped by StarsServlet in Stars.java
         success: (resultData) => handleResult(resultData) // Setting callback function to handle data returned successfully by the SingleStarServlet
     });
 }
@@ -185,7 +239,7 @@ if( genre != null){
     jQuery.ajax({
         dataType: "json",  // Setting return data type
         method: "GET",// Setting request method
-        url: "api/results?genre=" + genre, // Setting request url, which is mapped by StarsServlet in Stars.java
+        url: "api/results?genre=" + genre+"&offset="+offset+"&max="+max, // Setting request url, which is mapped by StarsServlet in Stars.java
         success: (resultData) => handleResult(resultData) // Setting callback function to handle data returned successfully by the SingleStarServlet
     });
 }

@@ -58,15 +58,21 @@ public class ResultsServlet extends HttpServlet {
                 //the prefix parameter is set,
                 //return all movies with the prefix in sql
                 String pre = request.getParameter("prefix");
+                int searchOffset = Integer.parseInt(request.getParameter("offset"));
+                int searchMax = Integer.parseInt(request.getParameter("max"));
+
+
                 System.out.println(pre);
 
                 //Statement prefixStatement = conn.createStatement();
                 //String oldPrefixQuery = "SELECT * FROM movies where title LIKE ?%";
-                String prefixQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r WHERE m.id=r.movieId AND m.title LIKE ? ORDER BY m.title ASC LIMIT 25";
+                String prefixQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r WHERE m.id=r.movieId AND m.title LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
 
 
                 PreparedStatement prefixStatement = conn.prepareStatement(prefixQuery);
                 prefixStatement.setString(1, pre + "%");
+                prefixStatement.setInt(2, searchMax);
+                prefixStatement.setInt(3, searchOffset);
 
                 ResultSet prefixResultSet = prefixStatement.executeQuery();
 
@@ -153,21 +159,24 @@ public class ResultsServlet extends HttpServlet {
             }
 
             if(request.getParameter("genre") != null) {
-                System.out.println("GENRE ISN't NULL LETS GO");
-                //SELECT m.title FROM movies as m, genres as g, genres_in_movies as gim WHERE gim.movieId=m.id AND gim.genreId=g.id AND g.name='Action'
-
 
                 //the prefix parameter is set,
                 //return all movies with the prefix in sql
+
                 String genreName = request.getParameter("genre");
-                System.out.println(genreName);
+                int searchOffset = Integer.parseInt(request.getParameter("offset"));
+                int searchMax = Integer.parseInt(request.getParameter("max"));
+
 
                 //Statement prefixStatement = conn.createStatement();
                 //SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, genres as g, genres_in_movies as gim, ratings as r WHERE gim.movieId=m.id AND gim.genreId=g.id AND r.movieId=m.id AND g.name='Action' ORDER BY r.rating DESC;
-                String genreListQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, genres as g, genres_in_movies as gim, ratings as r WHERE gim.movieId=m.id AND gim.genreId=g.id AND r.movieId=m.id AND g.name=? ORDER BY r.rating DESC";
+                String genreListQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, genres as g, genres_in_movies as gim, ratings as r WHERE gim.movieId=m.id AND gim.genreId=g.id AND r.movieId=m.id AND g.name=? ORDER BY r.rating DESC LIMIT ? OFFSET ?";
 
                 PreparedStatement genreStatement = conn.prepareStatement(genreListQuery);
                 genreStatement.setString(1, genreName);
+                genreStatement.setInt(2, searchMax);
+                genreStatement.setInt(3, searchOffset);
+
 
                 ResultSet genreResultSet = genreStatement.executeQuery();
 
