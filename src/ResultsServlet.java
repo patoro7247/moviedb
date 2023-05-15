@@ -280,6 +280,7 @@ public class ResultsServlet extends HttpServlet {
                 //Statement prefixStatement = conn.createStatement();
                 //String oldPrefixQuery = "SELECT * FROM movies where title LIKE ?%";
                 //String searchQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r WHERE m.id=r.movieId AND m.title LIKE ? AND m.year LIKE ? AND m.director LIKE ? ORDER BY m.title ASC LIMIT 25";
+                //String searchQuery = "SELECT DISTINCT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r, stars_in_movies as sim, stars as s WHERE m.id=r.movieId AND m.title LIKE ? AND m.year LIKE ? AND m.director LIKE ? AND sim.movieId=m.id AND s.id=sim.starId AND s.name LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
                 String searchQuery = "SELECT DISTINCT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r, stars_in_movies as sim, stars as s WHERE m.id=r.movieId AND m.title LIKE ? AND m.year LIKE ? AND m.director LIKE ? AND sim.movieId=m.id AND s.id=sim.starId AND s.name LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
 
                 PreparedStatement searchStatement = conn.prepareStatement(searchQuery);

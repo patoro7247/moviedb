@@ -46,8 +46,6 @@ public class AddMovieServlet extends HttpServlet {
         try (Connection conn = dataSource.getConnection()) {
             //check to see if movie already exists
             String checkMovieQuery = "select * from movies where title=? AND year=? AND director=?";
-
-
             PreparedStatement checkMovieStatement = conn.prepareStatement(checkMovieQuery);
 
             checkMovieStatement.setString(1, movieTitle);
@@ -68,7 +66,6 @@ public class AddMovieServlet extends HttpServlet {
             String newId = "tt";
             //get MAX id and increase it by 1
             Statement maxMovieStatement = conn.createStatement();
-
             String maxMovieIdQuery = "SELECT max(id) FROM movies";
             ResultSet rs = maxMovieStatement.executeQuery(maxMovieIdQuery);
 
@@ -106,6 +103,140 @@ public class AddMovieServlet extends HttpServlet {
             int row = updateMoviesStatement.executeUpdate();
             responseJsonObject.addProperty("rowsUpdated", row);
             responseJsonObject.addProperty("movieId", newId);
+
+
+            String updateRatingQuery = "INSERT INTO ratings VALUES (?, 0, 0)";
+            PreparedStatement updateRatingStatement = conn.prepareStatement(updateRatingQuery);
+            updateRatingStatement.setString(1, newId);
+
+            int ratingsUpdated = updateRatingStatement.executeUpdate();
+            responseJsonObject.addProperty("added num ratings:", ratingsUpdated);
+
+
+            //ADDING GENRES HERE
+            String checkGenreQuery = "select id, name from genres where name=?";
+            PreparedStatement checkGenreStatement = conn.prepareStatement(checkGenreQuery);
+            checkGenreStatement.setString(1, genre);
+
+            ResultSet checkGenreResults = checkGenreStatement.executeQuery();
+
+            if(checkGenreResults.next() != false){
+                System.out.println("Genre already exists");
+
+                int genreId = checkGenreResults.getInt("id");
+
+                String updateGenresInMoviesQuery = "INSERT INTO genres_in_movies VALUES (?, ?)";
+                PreparedStatement updateGenresInMoviesStatement = conn.prepareStatement(updateGenresInMoviesQuery);
+                updateGenresInMoviesStatement.setInt(1, genreId);
+                updateGenresInMoviesStatement.setString(2, newId);
+
+                int genresUpdated = updateGenresInMoviesStatement.executeUpdate();
+                responseJsonObject.addProperty("existing genre added: ", genreId);
+            }else{
+                System.out.println("Genre does not exist");
+
+                Statement maxGenreStatement = conn.createStatement();
+                String maxGenreIdQuery = "SELECT max(id) FROM genres";
+                ResultSet genreIdSet = maxGenreStatement.executeQuery(maxGenreIdQuery);
+
+                int newMaxGenreId = 0;
+
+                while(genreIdSet.next()){
+                    int oldMaxGenreId = genreIdSet.getInt("max(id)");
+                    newMaxGenreId = oldMaxGenreId + 1;
+                }
+                System.out.println("new genre id: "+ newMaxGenreId);
+
+                String updateGenresQuery = "INSERT INTO genres VALUES (?, ?)";
+                PreparedStatement updateGenresStatement = conn.prepareStatement(updateGenresQuery);
+                updateGenresStatement.setInt(1, newMaxGenreId);
+                updateGenresStatement.setString(2, genre);
+
+                int newGenresAdded = updateGenresStatement.executeUpdate();
+                responseJsonObject.addProperty("genres added", newGenresAdded);
+
+
+                String updateGenresInMoviesQuery = "INSERT INTO genres_in_movies VALUES (?, ?)";
+                PreparedStatement updateGenresInMoviesStatement = conn.prepareStatement(updateGenresInMoviesQuery);
+                updateGenresInMoviesStatement.setInt(1, newMaxGenreId);
+                updateGenresInMoviesStatement.setString(2, newId);
+
+                int newGenresInMovies = updateGenresInMoviesStatement.executeUpdate();
+                responseJsonObject.addProperty("new genre added, genres_in_movies updated: ", newGenresInMovies);
+
+            }
+
+
+
+            // check to see if star exists, if it does, add it to movies, else make a
+            // new star and add it to movie
+            String checkActorQuery = "select id, name from stars where name=?";
+            PreparedStatement checkActorStatement = conn.prepareStatement(checkActorQuery);
+            checkActorStatement.setString(1, starName);
+
+            ResultSet checkActorResults = checkActorStatement.executeQuery();
+
+            if(checkActorResults.next() != false){
+                System.out.println("star already exists");
+                responseJsonObject.addProperty("message2", "Star already exists, adding to movie...");
+
+                String starId = checkActorResults.getString("id");
+
+                //insert into stars_in_movies
+                String updateStarsInMoviesQuery = "INSERT INTO stars_in_movies VALUES (?, ?)";
+                PreparedStatement updateStarsInMoviesStatement = conn.prepareStatement(updateStarsInMoviesQuery);
+                updateStarsInMoviesStatement.setString(1, starId);
+                updateStarsInMoviesStatement.setString(2, newId);
+
+                int starsUpdated = updateStarsInMoviesStatement.executeUpdate();
+                responseJsonObject.addProperty("rowsUpdated", row);
+                responseJsonObject.addProperty("stars added", starsUpdated);
+
+            }else{
+                responseJsonObject.addProperty("message3", "Star doesnt exist, creating and adding to movie...");
+                //need to create a new star, with new id
+                String newStarId = "nm";
+                //get MAX id and increase it by 1
+                Statement maxStarStatement = conn.createStatement();
+                String maxStarIdQuery = "SELECT max(id) FROM stars";
+                ResultSet rs2 = maxStarStatement.executeQuery(maxStarIdQuery);
+
+                while(rs2.next()){
+                    String maxStarId = rs2.getString("max(id)");
+                    //parse string, increase it by 1, and set it as newId
+                    int numberPortion = Integer.parseInt(maxStarId.substring(2, maxStarId.length()));
+                    numberPortion++;
+                    newStarId += String.valueOf(numberPortion);
+                }
+                System.out.println("new star id: "+ newStarId);
+
+                String updateStarsQuery = "INSERT INTO stars VALUES (?, ?, ?)";
+                PreparedStatement updateStarsStatement = conn.prepareStatement(updateStarsQuery);
+
+                updateStarsStatement.setString(1, newStarId);
+                updateStarsStatement.setString(2, starName);
+                updateStarsStatement.setInt(3, 0);
+
+
+                int newStars = updateStarsStatement.executeUpdate();
+                responseJsonObject.addProperty("newStarId", newStarId);
+                responseJsonObject.addProperty("movieId", newId);
+
+
+                String updateStarsInMoviesQuery = "INSERT INTO stars_in_movies VALUES (?, ?)";
+                PreparedStatement updateStarsInMoviesStatement = conn.prepareStatement(updateStarsInMoviesQuery);
+                updateStarsInMoviesStatement.setString(1, newStarId);
+                updateStarsInMoviesStatement.setString(2, newId);
+
+                int starsUpdated = updateStarsInMoviesStatement.executeUpdate();
+                responseJsonObject.addProperty("rowsUpdated", row);
+                responseJsonObject.addProperty("stars added", starsUpdated);
+
+            }
+
+
+
+
 
 
 
