@@ -266,7 +266,7 @@ public class actorsParser {
         int[] iNoRows=null;
 
 
-        sqlInsertRecord="insert into newstars (id, name, birthYear) values(?,?,?)";
+        sqlInsertRecord="insert into stars (id, name, birthYear) values(?,?,?)";
         try {
             conn.setAutoCommit(false);
 
