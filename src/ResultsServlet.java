@@ -66,8 +66,8 @@ public class ResultsServlet extends HttpServlet {
 
                 //Statement prefixStatement = conn.createStatement();
                 //String oldPrefixQuery = "SELECT * FROM movies where title LIKE ?%";
+                //OG: String prefixQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r WHERE m.id=r.movieId AND m.title LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
                 String prefixQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r WHERE m.id=r.movieId AND m.title LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
-
 
                 PreparedStatement prefixStatement = conn.prepareStatement(prefixQuery);
                 prefixStatement.setString(1, pre + "%");

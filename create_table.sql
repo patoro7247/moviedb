@@ -28,6 +28,16 @@ CREATE TABLE `stars_in_movies` (
   CONSTRAINT `stars_in_movies_ibfk_2` FOREIGN KEY (`movieId`) REFERENCES `movies` (`id`)
 );
 
+CREATE TABLE `newstars_in_movies` (
+  `starId` varchar(10) NOT NULL,
+  `movieId` varchar(10) NOT NULL,
+  KEY `starId` (`starId`),
+  KEY `movieId` (`movieId`),
+  CONSTRAINT `newstars_in_movies_ibfk_1` FOREIGN KEY (`starId`) REFERENCES `newstars` (`id`),
+  CONSTRAINT `newstars_in_movies_ibfk_2` FOREIGN KEY (`movieId`) REFERENCES `newmovies` (`id`)
+);
+
+
 
 CREATE TABLE `genres` (
   `id` int NOT NULL AUTO_INCREMENT,

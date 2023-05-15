@@ -15,6 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import org.jasypt.util.password.StrongPasswordEncryptor;
+
 @WebServlet(name = "LoginServlet", urlPatterns = "/api/login")
 public class LoginServlet extends HttpServlet {
     /**
@@ -34,13 +36,34 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
+        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+        System.out.println(gRecaptchaResponse);
+
+        JsonObject responseJsonObject = new JsonObject();
+
+        PrintWriter out = response.getWriter();
+
+        try {
+            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+        } catch (Exception e) {
+            response.setContentType("text/html");
+            out.println("<html>");
+            out.println("<head><title>Error</title></head>");
+            out.println("<body>");
+            out.println("<p>recaptcha verification error</p>");
+            out.println("<p>" + e.getMessage() + "</p>");
+            out.println("</body>");
+            out.println("</html>");
+
+            out.close();
+            return;
+        }
+
         //HttpServletResponse httpResponse = (HttpServletResponse) response;
         /* This example only allows username/password to be test/test
         /  in the real project, you should talk to the database to verify username/password
         */
-        JsonObject responseJsonObject = new JsonObject();
 
-        PrintWriter out = response.getWriter();
         //set up database connection and check credentials
         try (Connection conn = dataSource.getConnection()) {
             // Get a connection from dataSource
@@ -59,13 +82,16 @@ public class LoginServlet extends HttpServlet {
             ResultSet rs = statement.executeQuery();
 
             // Iterate through each row of rs
+            boolean success = false;
             while (rs.next()) {
 
                 String realPassword = rs.getString("password");
+                success = new StrongPasswordEncryptor().checkPassword(password, realPassword);
+
                 int id = Integer.parseInt(rs.getString("id"));
                 // Create a JsonObject based on the data we retrieve from rs
 
-                if( password.equals(realPassword)){
+                if( success ){
                     //credentials match, log user in
                     request.getSession().setAttribute("user", new User(username, id));
 
