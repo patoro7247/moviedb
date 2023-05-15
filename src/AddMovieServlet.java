@@ -63,10 +63,10 @@ public class AddMovieServlet extends HttpServlet {
             }
 
 
-            String newId = "tt";
+            String newId = "tt0";
             //get MAX id and increase it by 1
             Statement maxMovieStatement = conn.createStatement();
-            String maxMovieIdQuery = "SELECT max(id) FROM movies";
+            String maxMovieIdQuery = "SELECT max(id) FROM movies WHERE id LIKE 'tt0%'";
             ResultSet rs = maxMovieStatement.executeQuery(maxMovieIdQuery);
 
             /*
@@ -198,7 +198,7 @@ public class AddMovieServlet extends HttpServlet {
                 String newStarId = "nm";
                 //get MAX id and increase it by 1
                 Statement maxStarStatement = conn.createStatement();
-                String maxStarIdQuery = "SELECT max(id) FROM stars";
+                String maxStarIdQuery = "SELECT max(id) FROM stars WHERE id LIKE 'nm%'";
                 ResultSet rs2 = maxStarStatement.executeQuery(maxStarIdQuery);
 
                 while(rs2.next()){
