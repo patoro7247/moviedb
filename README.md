@@ -1,4 +1,4 @@
-Video: https://www.youtube.com/watch?v=-ZTHQrnDHF4
+Video: https://youtu.be/RnuglOfBoD8
 
 # Prepared Statement Usage:
     

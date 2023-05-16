@@ -11,12 +11,12 @@ BEGIN
 
     IF s_count = 0 THEN
         --insert new star with NULL birthday
-        INSERT INTO stars VALUES
+        INSERT INTO stars VALUES (starName, 0)
     ELSE
 
 
     INSERT INTO movies VALUES (id, title, movieYear, director);
-    INSERT INTO movies VALUES (id, title, movieYear, director);
+    INSERT INTO ratings VALUES (id, 0, 0);
 END
 $$
 
