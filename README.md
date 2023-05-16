@@ -75,7 +75,26 @@ SingleStarServlet.java:
  2. Kept a hash map of inserted stars/movies, which reduced need for multiple DB connections
  and fewer queries
 
+Remark: VPS already starts at 80% memory usage after rebooting, I think if there was more memory(2gb) it would stop crashing during castsParser,
+
+Parsing and insertion of actorsParser(parsing actors63.xml) completed in 1.18s on dev machine
+Parsing of stars DID finish complete on VPS in 4.8s
+
+Parsing and insertion of mainsParser(parsing mains243.xml) completed in 1.4s on dev machine
+Parsing of mains243 did not ever complete on VPS, ran out of memory
+
+
+Parsing and insertion of castsParser(parsing casts124.xml) completed in 1m08s on dev machine
+Parsing of mains243 did not ever complete on VPS, ran out of memory
+
+
+
 
 # Inconsistent Data Report
- 54 duplicate movies found in mains243.xml
- 47055 castings parsed
+Parsed 12039 movies,  
+54 duplicate movies found in mains243.xml
+ 
+47055 castings parsed
+
+6863 actors parsed
+24 duplicates found

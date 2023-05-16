@@ -59,7 +59,7 @@ public class actorsParser {
 
     HashMap<String, Integer> idCount = new HashMap<String, Integer>();
 
-    static List<String> duplicateIds = new ArrayList<>();
+    static List<String> duplicateNames = new ArrayList<>();
 
     List<String> problemIds = new ArrayList<>();
 
@@ -115,6 +115,16 @@ public class actorsParser {
             }
              */
             String name = getTextValue(a, "stagename");
+
+            if(idCount.containsKey(name)){
+                int count = idCount.get(name);
+                count++;
+                idCount.put(name, count);
+                continue;
+            }else{
+                idCount.put(name, 1);
+            }
+
             int birthYear = 0;
             if( getTextValue(a, "dob") != null){
                 birthYear = getIntValue(a, "dob");
@@ -176,7 +186,7 @@ public class actorsParser {
     private void countDuplicates(){
         for(String key : idCount.keySet()){
             if(idCount.get(key) > 1){
-                duplicateIds.add(key);
+                duplicateNames.add(key);
             }
         }
     }
@@ -245,7 +255,8 @@ public class actorsParser {
 
         domParserExample.countDuplicates();
 
-        System.out.println(duplicateIds.size() + " duplicates");
+
+        System.out.println(duplicateNames.size() + " duplicates");
 
 
 
