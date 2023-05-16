@@ -78,4 +78,4 @@ SingleStarServlet.java:
 
 # Inconsistent Data Report
  54 duplicate movies found in mains243.xml
- 
+ 47055 castings parsed
