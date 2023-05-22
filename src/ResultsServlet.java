@@ -55,6 +55,7 @@ public class ResultsServlet extends HttpServlet {
         try (Connection conn = dataSource.getConnection()) {
 
             if(request.getParameter("prefix") != null){
+                System.out.println("Using first if statement");
                 //the prefix parameter is set,
                 //return all movies with the prefix in sql
                 String pre = request.getParameter("prefix");
@@ -159,6 +160,7 @@ public class ResultsServlet extends HttpServlet {
             }
 
             if(request.getParameter("genre") != null) {
+                System.out.println("Using genre if statement");
 
                 //the prefix parameter is set,
                 //return all movies with the prefix in sql
@@ -263,6 +265,7 @@ public class ResultsServlet extends HttpServlet {
             }
 
             if(request.getParameter("title") != null || request.getParameter("year") != null || request.getParameter("director") != null || request.getParameter("star") != null){
+                System.out.println("Using the really long if statement");
                 //the prefix parameter is set,
                 //return all movies with the prefix in sql
                 String searchTitle = request.getParameter("title");
@@ -277,14 +280,42 @@ public class ResultsServlet extends HttpServlet {
                     //processing here
                 }
 
-                //Statement prefixStatement = conn.createStatement();
-                //String oldPrefixQuery = "SELECT * FROM movies where title LIKE ?%";
-                //String searchQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r WHERE m.id=r.movieId AND m.title LIKE ? AND m.year LIKE ? AND m.director LIKE ? ORDER BY m.title ASC LIMIT 25";
-                //String searchQuery = "SELECT DISTINCT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r, stars_in_movies as sim, stars as s WHERE m.id=r.movieId AND m.title LIKE ? AND m.year LIKE ? AND m.director LIKE ? AND sim.movieId=m.id AND s.id=sim.starId AND s.name LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
+                //break down multiple keywords
+                //ex: "good u" needs to mean WHERE MATCH(title) AGAINST ('+good* +t*' IN BOOLEAN MODE)
+                //append + to beginning of word, and then *
+                //Use setString with new string
+
+                String fulltextParameter = '+'+searchTitle;
+                fulltextParameter = fulltextParameter.replaceAll(" ", "* +");
+
+                if(fulltextParameter.charAt(fulltextParameter.length()-1) != '*' ){
+                    fulltextParameter += '*';
+                }
+
+
+                /*
                 String searchQuery = "SELECT DISTINCT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r, stars_in_movies as sim, stars as s WHERE m.id=r.movieId AND m.title LIKE ? AND m.year LIKE ? AND m.director LIKE ? AND sim.movieId=m.id AND s.id=sim.starId AND s.name LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
+
+
+                String newSearchQuery = "SELECT DISTINCT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r, stars_in_movies as sim, stars as s WHERE MATCH(title) AGAINST (? IN BOOLEAN MODE) AND  m.id=r.movieId AND m.title LIKE ? AND m.year LIKE ? AND m.director LIKE ? AND sim.movieId=m.id AND s.id=sim.starId AND s.name LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
+
 
                 PreparedStatement searchStatement = conn.prepareStatement(searchQuery);
                 searchStatement.setString(1, "%"+ searchTitle + "%");
+                searchStatement.setString(2, searchYear + "%");
+                searchStatement.setString(3, "%"+ searchDirector + "%");
+                searchStatement.setString(4, "%"+ searchStar + "%");
+                searchStatement.setInt(5, searchMax);
+                searchStatement.setInt(6, searchOffset);
+
+                ResultSet searchResultSet = searchStatement.executeQuery();
+
+                 */
+                String newSearchQuery = "SELECT DISTINCT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r, stars_in_movies as sim, stars as s WHERE MATCH(title) AGAINST (? IN BOOLEAN MODE) AND  m.id=r.movieId AND m.year LIKE ? AND m.director LIKE ? AND sim.movieId=m.id AND s.id=sim.starId AND s.name LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
+                System.out.println(fulltextParameter);
+
+                PreparedStatement searchStatement = conn.prepareStatement(newSearchQuery);
+                searchStatement.setString(1, fulltextParameter);
                 searchStatement.setString(2, searchYear + "%");
                 searchStatement.setString(3, "%"+ searchDirector + "%");
                 searchStatement.setString(4, "%"+ searchStar + "%");

@@ -31,7 +31,7 @@ function handleAddToCartSuccess(resultData) {
 function next(){
     let url = window.location.href;
 
-    console.log(url);
+    //console.log(url);
     let offset = getParameterByName('offset');
     let max = getParameterByName('max');
 
@@ -128,13 +128,13 @@ function getParameterByName(target) {
  */
 
 function handleResult(resultData) {
-    console.log("handleResults: populating movie table from resultData");
+    //console.log("handleResults: populating movie table from resultData");
 
     // Populate the star table
     // Find the empty table body by id "star_table_body"
     let starTableBodyElement = jQuery("#star_table_body");
 
-    console.log(resultData[0]["genres"]);
+    //console.log(resultData[0]["genres"]);
 
     let rank = 1;
     // Iterate through resultData, no more than 10 entries
@@ -158,7 +158,7 @@ function handleResult(resultData) {
         }
         if(genreString.length > 1) genreString = genreString.substring(0, genreString.length-2);
 
-        console.log(genreString);
+        //console.log(genreString);
 
 
         //concatenate stars
@@ -175,7 +175,7 @@ function handleResult(resultData) {
         //get rid of comma
         if(starString.length > 1) starString = starString.substring(0, starString.length-2);
 
-        console.log(starString);
+        //console.log(starString);
 
 
         // Concatenate the html tags with resultData jsonObject
