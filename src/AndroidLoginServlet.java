@@ -1,10 +1,10 @@
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -15,14 +15,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.jasypt.util.password.StrongPasswordEncryptor;
-
-@WebServlet(name = "LoginServlet", urlPatterns = "/api/login")
-public class LoginServlet extends HttpServlet {
+@WebServlet(name = "AndroidLoginServlet", urlPatterns = "/api/androidlogin")
+public class AndroidLoginServlet extends HttpServlet {
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 1L;
     private DataSource dataSource;
 
     public void init(ServletConfig config) {
@@ -37,30 +35,29 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
 
-        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-        System.out.println("grecaptcha response: "+gRecaptchaResponse);
-
         JsonObject responseJsonObject = new JsonObject();
         System.out.println("Requested username: "+username);
         System.out.println("Requested password: "+password);
 
         PrintWriter out = response.getWriter();
 
-        try {
-            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-        } catch (Exception e) {
-            response.setContentType("text/html");
-            out.println("<html>");
-            out.println("<head><title>Error</title></head>");
-            out.println("<body>");
-            out.println("<p>recaptcha verification error</p>");
-            out.println("<p>" + e.getMessage() + "</p>");
-            out.println("</body>");
-            out.println("</html>");
 
-            out.close();
-            return;
-        }
+//        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+//        try {
+//            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+//        } catch (Exception e) {
+//            response.setContentType("text/html");
+//            out.println("<html>");
+//            out.println("<head><title>Error</title></head>");
+//            out.println("<body>");
+//            out.println("<p>recaptcha verification error</p>");
+//            out.println("<p>" + e.getMessage() + "</p>");
+//            out.println("</body>");
+//            out.println("</html>");
+//
+//            out.close();
+//            return;
+//        }
 
         //HttpServletResponse httpResponse = (HttpServletResponse) response;
         /* This example only allows username/password to be test/test
@@ -85,8 +82,23 @@ public class LoginServlet extends HttpServlet {
             ResultSet rs = statement.executeQuery();
 
             // Iterate through each row of rs
+            boolean thruMethod = false;
             boolean success = false;
+
+            //if there's no rows, then the username doesn't exist
+//            if(rs.next() == false){
+//                responseJsonObject.addProperty("status", "fail");
+//                responseJsonObject.addProperty("message", "username does not exist");
+//
+//            }else{
+//                System.out.println("rs.next() is not empty");
+//            }
+//
+//
             while (rs.next()) {
+                thruMethod = true;
+                //String userId = rs.getString("id");
+                System.out.println("testing this");
 
                 String realPassword = rs.getString("password");
                 success = new StrongPasswordEncryptor().checkPassword(password, realPassword);
@@ -113,6 +125,11 @@ public class LoginServlet extends HttpServlet {
                 }
 
 
+            }
+
+            if( thruMethod == false){
+                responseJsonObject.addProperty("status", "fail");
+                responseJsonObject.addProperty("message", "username does not exist");
             }
 
 

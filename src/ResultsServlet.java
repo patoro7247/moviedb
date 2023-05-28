@@ -269,12 +269,17 @@ public class ResultsServlet extends HttpServlet {
                 //the prefix parameter is set,
                 //return all movies with the prefix in sql
                 String searchTitle = request.getParameter("title");
+
+
+
                 String searchYear = request.getParameter("year");
                 String searchDirector = request.getParameter("director");
                 String searchStar = request.getParameter("star");
                 int searchOffset = Integer.parseInt(request.getParameter("offset"));
+                System.out.println("requested query: " +searchTitle);
                 int searchMax = Integer.parseInt(request.getParameter("max"));
 
+                System.out.println("Search Offset: "+searchOffset+", Search Max: "+searchMax);
 
                 if(searchStar != null && !searchStar.isEmpty()){
                     //processing here
@@ -399,6 +404,7 @@ public class ResultsServlet extends HttpServlet {
 
                 // Write JSON string to output
                 out.write(jsonArray.toString());
+                System.out.println(jsonArray.toString());
                 // Set response status to 200 (OK)
                 response.setStatus(200);
 
