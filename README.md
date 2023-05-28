@@ -43,8 +43,8 @@ ResultsServlet.java:
     String genreListQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, genres as g, genres_in_movies as gim, ratings as r WHERE gim.movieId=m.id AND gim.genreId=g.id AND r.movieId=m.id AND g.name=? ORDER BY r.rating DESC LIMIT ? OFFSET ?";
     PreparedStatement genreStatement = conn.prepareStatement(genreListQuery);
     
-    String searchQuery = "SELECT DISTINCT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r, stars_in_movies as sim, stars as s WHERE m.id=r.movieId AND m.title LIKE ? AND m.year LIKE ? AND m.director LIKE ? AND sim.movieId=m.id AND s.id=sim.starId AND s.name LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
-    PreparedStatement searchStatement = conn.prepareStatement(searchQuery);
+    String newSearchQuery = "SELECT DISTINCT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r, stars_in_movies as sim, stars as s WHERE MATCH(title) AGAINST (? IN BOOLEAN MODE) AND  m.id=r.movieId AND m.year LIKE ? AND m.director LIKE ? AND sim.movieId=m.id AND s.id=sim.starId AND s.name LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
+    PreparedStatement searchStatement = conn.prepareStatement(newSearchQuery);
 
 
 SingleMovieServlet.java:

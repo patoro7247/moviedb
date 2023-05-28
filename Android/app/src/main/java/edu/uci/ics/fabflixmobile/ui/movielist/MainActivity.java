@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView newMessage;
 
 
-    private final String host = "13.56.200.210";
+    private final String host = "18.144.40.83";
     private final String port = "8443";
     //OG: private final String domain = "cs122b_project2_login_cart_example_war";
     private final String domain = "cs122b-project1-api-example";

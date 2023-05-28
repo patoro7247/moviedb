@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
       To connect to your machine, you need to use the below IP address
      */
     //OG: private final String host = "10.0.2.2";
-    private final String host = "13.56.200.210";
+    private final String host = "18.144.40.83";
     //OG: private final String port = "8080";
     private final String port = "8443";
 
