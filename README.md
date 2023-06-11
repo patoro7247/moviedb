@@ -1,100 +1,83 @@
-New Video 5/26: https://youtu.be/d5qCPSWpb94
+New Video 6/11: https://www.youtube.com/watch?v=uT1p8u-C_B0
 
-# Prepared Statement Usage:
-    
-CheckoutServlet.java:
+- # General
+ - #### Team#: Fullstackers
 
-    String query = "select id, firstName, lastName, expiration from creditcards where id=?";
-    PreparedStatement statement = conn.prepareStatement(query);
+ - #### Names: Patrick Harding
+  
+ - #### Project 5 Video Demo Link: https://www.youtube.com/watch?v=uT1p8u-C_B0
 
-    String movieIdQuery = "select id from movies where title=?";
-    PreparedStatement movieIdStatement = conn.prepareStatement(movieIdQuery);
+ - #### Instruction of deployment:
+   - All 5(original,master,slave,aws loadbalancer, gcp load balancer) websites are deployed with links on Project 1 submission google doc.
+   - To deploy this locally:  
+     - Navigate to root directory
+     - Run mvn clean
+     - Run mvn package
+     - Edit run configuration to use generated cs122b-project1-api-example.war file
+     - Run tomcat on intellij
 
-    String insertSalesQuery = "INSERT INTO sales VALUES (NULL, ?, ?, DATE ?)";
-    PreparedStatement salesInsertStatement = conn.prepareStatement(insertSalesQuery);
-
-
-LoginServlet.java:
-           
-    String query = "SELECT password, id from customers where email=?";
-    PreparedStatement statement = conn.prepareStatement(query);
-
-            
-MoviesServlet.java:
-
-    String genreQuery = "SELECT g.name FROM genres as g, genres_in_movies as gim, movies as m WHERE g.id=gim.genreId AND m.id=? AND m.id=gim.movieId ORDER BY g.name ASC LIMIT 3";
-    PreparedStatement statement2 = conn.prepareStatement(genreQuery);
-
-    String starsQuery = "SELECT s.name, s.id FROM stars_in_movies as sim, stars as s, movies as m WHERE sim.movieId=m.id AND sim.starId=s.id AND m.id=? ORDER BY s.name ASC LIMIT 3";
-    PreparedStatement statement3 = conn.prepareStatement(starsQuery);
+ - #### Collaborations and Work Distribution:
+   I worked on this project on my own
 
 
-ResultsServlet.java:
-
-    String prefixQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r WHERE m.id=r.movieId AND m.title LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
-    PreparedStatement prefixStatement = conn.prepareStatement(prefixQuery);
-
-    String genreQuery = "SELECT g.name FROM genres as g, genres_in_movies as gim, movies as m WHERE g.id=gim.genreId AND m.id=? AND m.id=gim.movieId ORDER BY g.name ASC LIMIT 3";
-    PreparedStatement statement2 = conn.prepareStatement(genreQuery);
-
-    String starsQuery = "SELECT s.name, s.id FROM stars_in_movies as sim, stars as s, movies as m WHERE sim.movieId=m.id AND sim.starId=s.id AND m.id=? ORDER BY s.name ASC LIMIT 3";
-    PreparedStatement statement3 = conn.prepareStatement(starsQuery);
-
-    String genreListQuery = "SELECT m.id, m.title, m.year, m.director, r.rating FROM movies as m, genres as g, genres_in_movies as gim, ratings as r WHERE gim.movieId=m.id AND gim.genreId=g.id AND r.movieId=m.id AND g.name=? ORDER BY r.rating DESC LIMIT ? OFFSET ?";
-    PreparedStatement genreStatement = conn.prepareStatement(genreListQuery);
-    
-    String newSearchQuery = "SELECT DISTINCT m.id, m.title, m.year, m.director, r.rating FROM movies as m, ratings as r, stars_in_movies as sim, stars as s WHERE MATCH(title) AGAINST (? IN BOOLEAN MODE) AND  m.id=r.movieId AND m.year LIKE ? AND m.director LIKE ? AND sim.movieId=m.id AND s.id=sim.starId AND s.name LIKE ? ORDER BY m.title ASC LIMIT ? OFFSET ?";
-    PreparedStatement searchStatement = conn.prepareStatement(newSearchQuery);
+- # Connection Pooling
+ - #### Include the filename/path of all code/configuration files in GitHub of using JDBC Connection Pooling.
+   /WebContent/META-INF/context.xml  
+   /WebContent/WEB-INF/web.xml  
+   /src/ResultsServlet.js  
+   /src/* - All servlet files that query db use a data source with pooling
 
 
-SingleMovieServlet.java:
+    - #### Explain how Connection Pooling is utilized in the Fabflix code.
+  We initialize a data source from our MySQL server that uses connection pooling, which creates many connections for the server to use at its will, after which it returns the connection back to the pool. When we query the db using this data source, one connection is temporarily used to get the response from the MySQL server. Every Servlet file that queries the backend uses a data source with connection pooling.
 
-    String query3 = "SELECT s.id, s.name FROM stars as s, stars_in_movies as sim WHERE sim.movieId=? AND s.id=sim.starId ORDER BY s.name ASC";
-    PreparedStatement statement3 = conn.prepareStatement(query3);
+    - #### Explain how Connection Pooling works with two backend SQL.
+  Each SQL server will have its own pool of connections, and queries will be routed to one of the 2 backend servers.
+  When one of those servers receive the request, they will pull a connection out of their pool, serve the request, and return the connection back to the pool.
 
-    String query2 = "SELECT g.name FROM genres_in_movies as gim, genres as g WHERE gim.movieId=? AND gim.genreId=g.id ORDER BY g.name ASC";
-    PreparedStatement statement2 = conn.prepareStatement(query2);
-
-    String query = "SELECT title, year, director, rating FROM movies as m, ratings as r WHERE m.id=? AND r.movieId=m.id";
-    PreparedStatement statement = conn.prepareStatement(query);
-
-
-SingleStarServlet.java:
-
-    String query = "SELECT name, birthYear FROM stars WHERE id=?";
-    PreparedStatement statement = conn.prepareStatement(query);
-    
-    String query2 = "SELECT m.title, sim.movieId FROM stars_in_movies as sim, movies as m WHERE sim.starId=? AND sim.movieId = m.id ORDER BY m.title ASC";
-    PreparedStatement statement2 = conn.prepareStatement(query2);
+   Sticky session: We need a way for the cluster of servers to recognize the cookies from users for subsequent requests.
+   We implement this with sticky sessions, which associate a client and cookie with a the same server in the cluster. All requests
+   from the client should go to the same instance in the cluster of servers. In this way, the cluster of servers can recognize a client's
+   information from a session.
 
 
+- # Master/Slave
+ - #### Include the filename/path of all code/configuration files in GitHub of routing queries to Master/Slave SQL.
+   WebContent/META-INF/context.xml
+   
 
-# Performance Optimizations:
- 1. Using batch commits made longest insertion only a minute long  
-
- 2. Kept a hash map of inserted stars/movies, which reduced need for multiple DB connections
- and fewer queries
-
-Remark: VPS already starts at 80% memory usage after rebooting, I think if there was more memory(2gb) it would stop crashing during castsParser,
-
-Parsing and insertion of actorsParser(parsing actors63.xml) completed in 1.18s on dev machine
-Parsing of stars DID finish complete on VPS in 4.8s
-
-Parsing and insertion of mainsParser(parsing mains243.xml) completed in 1.4s on dev machine
-Parsing of mains243 did not ever complete on VPS, ran out of memory
+ - #### How read/write requests were routed to Master/Slave SQL?
+   MySQLRouter sits as middleware between tomcat and mysql server. There are connections in the context file that use the MySQL router
+   instead of connecting straight to the Database. Write requests are routed to the Master SQL database that's configured by the MySQL router.
+   Read and write requests are sent to both the master and slave sql servers by the router.
 
 
-Parsing and insertion of castsParser(parsing casts124.xml) completed in 1m08s on dev machine
-Parsing of mains243 did not ever complete on VPS, ran out of memory
+- # JMeter TS/TJ Time Logs
+- #### Instructions of how to use the `log_processing.*` script to process the JMeter logs.
+  Type into console: python3 log_processing.py [NAME_OF_LOG_FILE #1]  
+
+  for processing averages of only one file
 
 
+-  Type into console: python3 log_processing.py [NAME_OF_LOG_FILE #1] [NAME_OF_LOG_FILE #2]  
+  for processing averages of both master/slave text files
 
 
-# Inconsistent Data Report
-Parsed 12039 movies,  
-54 duplicate movies found in mains243.xml
- 
-47055 castings parsed
+- # JMeter TS/TJ Time Measurement Report
 
-6863 actors parsed
-24 duplicates found
+- Note: I used the GCP server as the balancer for scaled tests as it was faster than the AWS balancer
+- Note: Case #1 only needs one log file due to there being only 1 thread; all requests only go to one server due to sticky sessions
+
+
+| **Single-instance Version Test Plan**          | **Graph Results Screenshot**     | **Average Query Time(ms)** | **Average Search Servlet Time(ms)** | **Average JDBC Time(ms)** | **Analysis**                                                              |
+|------------------------------------------------|----------------------------------|----------------------------|-------------------------------------|---------------------------|---------------------------------------------------------------------------|
+| Case 1: HTTP/1 thread                          | ![](img/SingleInstanceCase1.png) | 56                         | 35                                  | 29                        | Fastest time due to only 1 thread being used                              |
+| Case 2: HTTP/10 threads                        | ![](img/SingleInstanceCase2.png) | 75                         | 85.358                              | 68.734                    | Avg query time is slower due to 10 threads                                |
+| Case 3: HTTPS/10 threads                       | ![](img/SingleInstanceCase3.png) | 89                         | 71                                  | 88                        | Slower due to HTTPS having a larger request/response complexity than HTTP |
+| Case 4: HTTP/10 threads/No connection pooling  | ![](img/SingleInstanceCase4.png) | 80ms                       | 75                                  | 69                        | No Connection Pooling made queries slower                                 |
+
+| **Scaled Version Test Plan**                   | **Graph Results Screenshot**     | **Average Query Time(ms)** | **Average Search Servlet Time(ms)** | **Average JDBC Time(ms)** | **Analysis**                                                                                                           |
+|------------------------------------------------|----------------------------------|----------------------------|-------------------------------------|---------------------------|------------------------------------------------------------------------------------------------------------------------|
+| Case 1: HTTP/1 thread                          | ![](img/ScaledInstanceCase1.png) | 90                         | 27                                  | 32                        | TJ/TS are low relative to average query time, I suspect the load balancer is adding more time to the requests/responses |
+| Case 2: HTTP/10 threads                        | ![](img/ScaledInstanceCase2.png) | 80                         | 69                                  | 58                        | TJ/TS are now higher than case 1, due to 10 threads being used                                                         |
+| Case 3: HTTP/10 threads/No connection pooling  | ![](img/ScaledInstanceCase3.png) | 108ms                      | 52                                  | 48                        | TJ/TS are similar to case 2, but the average query time is much higher                                                 |

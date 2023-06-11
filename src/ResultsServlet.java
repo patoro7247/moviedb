@@ -15,6 +15,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.io.File;
+import java.io.FileWriter;
+
+
+
 
 // Declaring a WebServlet called ResultsServlet, which maps to url "/api/results"
 @WebServlet(name = "ResultsServlet", urlPatterns = "/api/results")
@@ -24,9 +29,14 @@ public class ResultsServlet extends HttpServlet {
     // Create a dataSource which registered in web.
     private DataSource dataSource;
 
+
+
+
     public void init(ServletConfig config) {
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedbexample");
+
+
         } catch (NamingException e) {
             e.printStackTrace();
         }
@@ -36,6 +46,27 @@ public class ResultsServlet extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //Start total time here
+        long startTotalTime = System.nanoTime();
+
+        String contextPath = request.getServletContext().getRealPath("/");
+
+        String xmlFilePath=contextPath+"\\test.txt";
+
+        System.out.println(xmlFilePath);
+        File myfile = new File(xmlFilePath);
+        System.out.println(myfile.getAbsolutePath());
+
+        System.out.println("does myfile already exist?: "+myfile.exists());
+
+        if(!myfile.exists()){
+            System.out.println("Creating file now");
+            myfile.createNewFile();
+        }
+
+        FileWriter writer = new FileWriter(xmlFilePath, true);
+
+
 
         response.setContentType("application/json"); // Response mime type
 
@@ -53,6 +84,8 @@ public class ResultsServlet extends HttpServlet {
 //        }
         // Get a connection from dataSource and let resource manager close the connection after usage.
         try (Connection conn = dataSource.getConnection()) {
+            //Start JDBC parts per time here
+            long startJDBCTime = System.nanoTime();
 
             if(request.getParameter("prefix") != null){
                 System.out.println("Using first if statement");
@@ -402,6 +435,12 @@ public class ResultsServlet extends HttpServlet {
                 searchResultSet.close();
                 searchStatement.close();
 
+                //end JDBC time here
+                long endJDBCTime = System.nanoTime();
+                long elapsedJDBCTime = endJDBCTime - startJDBCTime;
+
+                writer.write(String.valueOf(elapsedJDBCTime)+", ");
+
                 // Write JSON string to output
                 out.write(jsonArray.toString());
                 System.out.println(jsonArray.toString());
@@ -418,6 +457,15 @@ public class ResultsServlet extends HttpServlet {
             //out.write(jsonArray.toString());
             // Set response status to 200 (OK)
             response.setStatus(200);
+
+            long endTotalTime = System.nanoTime();
+            long elapsedTotalTime = endTotalTime-startTotalTime;
+
+            writer.write(String.valueOf(elapsedTotalTime));
+            writer.write(System.getProperty( "line.separator" ));
+
+            writer.close();
+
 
         } catch (Exception e) {
 
