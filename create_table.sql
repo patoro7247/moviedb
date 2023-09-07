@@ -101,3 +101,11 @@ CREATE TABLE `ratings` (
 );
 
 
+
+CREATE TABLE `newratings` (
+  `movieId` varchar(10) NOT NULL,
+  `rating` float NOT NULL,
+  `numVotes` int NOT NULL,
+  KEY `movieId` (`movieId`),
+  CONSTRAINT `newratings_ibfk_1` FOREIGN KEY (`movieId`) REFERENCES `newmovies` (`id`)
+);
