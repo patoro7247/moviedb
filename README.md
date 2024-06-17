@@ -1,11 +1,9 @@
 New Video 6/11: https://www.youtube.com/watch?v=uT1p8u-C_B0
 
 - # General
- - #### Team#: Fullstackers
 
- - #### Names: Patrick Harding
   
- - #### Project 5 Video Demo Link: https://www.youtube.com/watch?v=uT1p8u-C_B0
+ - #### Video Demo Link: https://www.youtube.com/watch?v=uT1p8u-C_B0
 
  - #### Instruction of deployment:
    - All 5(original,master,slave,aws loadbalancer, gcp load balancer) websites are deployed with links on Project 1 submission google doc.
