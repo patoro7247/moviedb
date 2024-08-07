@@ -1,5 +1,7 @@
 New Video 6/11: https://www.youtube.com/watch?v=uT1p8u-C_B0
 
+![Web GUI](./movieDBScreenshot.png)
+
 - # General
 
   
